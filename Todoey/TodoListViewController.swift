@@ -9,14 +9,14 @@ import UIKit
 
 class TodoListViewController: UITableViewController {
 
-    let itemArray = ["Find Milk", "Buy Eggs", "Destory Demogorgon"]
+    var itemArray = ["Find Milk", "Buy Eggs", "Destory Demogorgon"]
     
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
     }
     
-    //MARK: - TableView Datasource Methods
+//MARK: - TableView Datasource Methods
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return itemArray.count
     }
@@ -29,7 +29,7 @@ class TodoListViewController: UITableViewController {
         return cell
     }
     
-    //MARK: - TableView Delegate Methods
+//MARK: - TableView Delegate Methods
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         
         if tableView.cellForRow(at: indexPath)?.accessoryType == .checkmark {
@@ -39,9 +39,36 @@ class TodoListViewController: UITableViewController {
         }
         
         tableView.deselectRow(at: indexPath, animated: true) // ----> seçili satırın sürekli olarak renkli gösterilmesini engelliyor niiiiiice
-        
     }
 
-
+//MARK: - Add New Items
+    @IBAction func AddButtonPressed(_ sender: UIBarButtonItem) {
+        var textField = UITextField() // alertTextField kullanımı için
+        
+        let alert = UIAlertController(title: "Yeni Todoey Ekle", message: "", preferredStyle: .alert)
+        
+        let action = UIAlertAction(title: "Ekle", style: .default) { (action) in // bu alan butona basıldığında olmasını sağlayacağımız alan işte bu yüzden textfield alanını yazdırmak istiyorsak burada yapmalıyız, tetiklenen yer burası addTextField metodu değil orası sadece veri girişi için var.
+            
+            // what will happen once the user clicks add the item button or on our UIAlert
+            //print(textField.text)
+            
+            self.itemArray.append(textField.text!)
+            self.tableView.reloadData()
+        }
+        
+        alert.addTextField { (alertTextField) in
+            alertTextField.placeholder = "Yeni item"
+            //print(alertTextField.text) // burada hata aldık sebebiyse print closure içerisinde ve butona basıldığında neler olacağı zaten yukarıdaki metotta var. Fakat biz burada textfield içeriğine ne yazıldığını almak istiyoruz çünkü kullanacağız.. o halde IBAction içerisinde yerel bir değişken oluşturursak bu problemi çözeriz.
+            textField = alertTextField
+        }
+        
+        alert.addAction(action)  // aciton sabitimizi eklediğimiz yer.
+        
+        // present(<#T##viewControllerToPresent: UIViewController##UIViewController#>, animated: <#T##Bool#>)
+        present(alert, animated: true, completion: nil)
+        
+        
+    }
+    
 }
 

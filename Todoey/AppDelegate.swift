@@ -14,10 +14,31 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-        // Override point for customization after application launch.
+        // Uygulama yüklendiğinde çağırılan yer, uygulamanın çökmesi önemli değil, burası çalışan ilk yer
+        //print("ilk açılan yer")
+        
+        // for userdefault .. dosya yoluna ulaşmak için buraya işlem yapacağız NOT bu kod satırları simulator için ve kesinlikle kayıt işlemi için ilgili butonlara basmamız gerekiyor.
+//        print(NSSearchPathForDirectoriesInDomains(<#T##directory: FileManager.SearchPathDirectory##FileManager.SearchPathDirectory#>, <#T##domainMask: FileManager.SearchPathDomainMask##FileManager.SearchPathDomainMask#>, <#T##expandTilde: Bool##Bool#>))
+        
+        //print(NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true).last! )  // ilki dizin, ikincisi etki alanı, tilde yi genişletmek için true diyeceğiz ek olarak .last deme sebebimiz ise son öğeyi alma isteği.. ve sonucunu string olarak yazdıracağız. Uygulamamızı çalıştırdığımız anda console da dosya yolumuzu göreceğiz.
+        
         return true
     }
 
+    func applicationWillResignActive(_ application: UIApplication) {
+        // uygulama açıkken telefona bir şey olduğunda (örn, telefon çağrı alırsa) tetiklenme eğilimindedir. Uygulama veri kaybını önlemek için burada bir şeyler yapabiliriz. Diyelim ki bir form dolduruluyor ve o an telefon çaldı, çalmayla beraber tetiklendiği için kullanıcı verilerini kaybetmesin diye burada kayıt işlemi yapabilriz.
+        print("telefon çaldığında")
+    }
+    
+    func applicationDidEnterBackground(_ application: UIApplication) {
+        // uygulamamız ekrandan kaybolduğunda, örn, ana ekran düğmesine basıldı veya farklı bir uygulamayı açtığımızda tetiklenir, yani uygulama artık görünmüyor ve arka plana giriyor.
+        print("uygulamanın görünmediği yer.")
+    }
+    
+    func applicationWillTerminate(_ application: UIApplication) {
+        // uygulamamızın sonlandırılacağı noktadır, kullanıcı veya sistem tarafından tetiklenebilir, sistem tetiklemesi geçiş yapılan bir başka uygulama var ve kaynağı yoğun olarak kullanıyorsa örn bir oyun olabilir bu.. işte o zaman sistem tarafından kullanılan kaynakların çoğunu geri alabilir. Arka planda olsa bile, hala çalışan işlemleri olabilir ve iphone belleğini kullanıyor olabilir.. Bu gibi durumlarda, kaynaklar uygulamamızdan geri alındığında, uygulamamız arka planda olmaktan çıkar ve işletim sistemi sonlandırmaya veya kapatmaya başlar.
+        print("uygulama kapatılıyor")
+    }
     // MARK: UISceneSession Lifecycle
 
     func application(_ application: UIApplication, configurationForConnecting connectingSceneSession: UISceneSession, options: UIScene.ConnectionOptions) -> UISceneConfiguration {

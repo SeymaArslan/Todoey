@@ -49,9 +49,11 @@ class TodoListViewController: UITableViewController {
         
         // burada 2 farklı tableView geliyor V sembolu olan global ve bu UITableViewController'ı alt sınıflandırarak elde ettiğimz şey, main üzerindeki tableView dan IBOutlet oluşturmamızla aynı şeydir. L sembolu olan lokal değişken buradaki metot parametrelerinden biri olarak gelir. Projemizde hangisini seçtiğimizin bir önemi yok çünkğü ikisi de aynı şeye atıfta bulunuyor
         let cell = tableView.dequeueReusableCell(withIdentifier: "ToDoItemCell", for: indexPath)
-        cell.textLabel?.text = itemArray[indexPath.row].title
+       
+        let item = itemArray[indexPath.row]
+        cell.textLabel?.text = item.title
         
-        if itemArray[indexPath.row].done == true {
+        if item.done == true {
             cell.accessoryType = .checkmark
         }   else {
             cell.accessoryType = .none
@@ -63,19 +65,15 @@ class TodoListViewController: UITableViewController {
 //MARK: - TableView Delegate Methods
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         
+        itemArray[indexPath.row].done = !itemArray[indexPath.row].done
+        /*
         if itemArray[indexPath.row].done == false {
             itemArray[indexPath.row].done = true
         }   else {
             itemArray[indexPath.row].done = false
-        }
+        }   */
         
-        tableView.reloadData() 
-        
-        /*if tableView.cellForRow(at: indexPath)?.accessoryType == .checkmark {
-            tableView.cellForRow(at: indexPath)?.accessoryType = .none
-        }   else {
-            tableView.cellForRow(at: indexPath)?.accessoryType = .checkmark  // belirli bir dizin yolunda bulunan hücreye bir referans alır, belirlediğimiz dizin yolu ise bu metotta seçtiğimiz ve aksesuar kullanmamıza izin verecek.
-        } */
+        tableView.reloadData()
         
         tableView.deselectRow(at: indexPath, animated: true) // ----> seçili satırın sürekli olarak renkli gösterilmesini engelliyor niiiiiice
     }

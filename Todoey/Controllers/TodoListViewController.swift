@@ -11,7 +11,7 @@ class TodoListViewController: UITableViewController {
 
     //var itemArray = ["Find Milk", "Buy Eggs", "Destory Demogorgon"]
     // 1) Her veriyi bir özellikle ilişkilendirme 
-    // listeye fazlaca veri eklediğimizde check yaptığımız satırın dışında başka bir verinin de check olduğunu, işareeti kaldırdığımızda seçtiğimiz satırda da işaretin kalktığını görüyoruz ve bu çok saçma bir davranış.. Sebebine gelirsek; Tablo hücremizde aslında bir satır işaretliyoruz, ardından scroll ettiğimizde kendisine gelen bilgi seçili bir satır olduğu fakat kaydırma ile değişen ekranda seçili bir satır olmadığından tablo da dolaşır ve bir satırı işaretler. dequeueReusableCell yönteminde seçtiğimiz satır görünümde kaybolduğu noktada, tablo görünümünün etrafına gelir ve altta yeni bir tablo görünümü hücresi olarak yeniden başlatılır, yeniden kullanıldığı için, aksesuarı kontrol eden özellik hala burada mevcuttur işte bu yüzden bu tuhaf davranışla karşılaşıyoruz. Öte yandan let cell = UITableViewCell(style: .default, reuseIdentifier: "ToDoItemCell") hücreleri bu şekilde tanımlamış olsaydıkta ekranı kaydırdığımızda seçili bir satır yerine göreceğimiz şey, işaretlediğimiz satıra döndüğümüzde işaretimizin kaybolmasıdır, bunun nedeni ise işaretleme veya işareti kaldırmanın hücre üzerinde bir özellik ayarlıyor olmasıdır. Hücre ekrandan kaybolduğunda, ayrılmış ve yok edilmiş olur, geri eski yerine kaydırdığımızda aslında tablo hücresinin eklendiği yepyeni bir hücre almaktayız... Sorun şu ki, bir özelliği hücreyle değil verilerle ilişkilendirmemiz gerekiyor. Yani her hücreyi işaretli/işaretsiz özellikle ilişkilendirebilmemizin bir yoluna gerek duyuyoruz.
+    // listeye fazlaca veri eklediğimizde check yaptığımız satırın dışında başka bir verinin de check olduğunu, işareeti kaldırdığımızda seçtiğimiz satırda da işaretin kalktığını görüyoruz ve bu çok saçma bir davranış.. Sebebine gelirsek; Tablo hücremizde aslında bir satır işaretliyoruz, ardından scroll ettiğimizde kendisine gelen bilgi seçili bir satır olduğu fakat kaydırma ile değişen ekranda seçili bir satır olmadığından tablo da dolaşır ve bir satırı işaretler. dequeueReusableCell yönteminde seçtiğimiz satır görünümde kaybolduğu noktada, tablo görünümünün etrafına gelir ve altta yeni bir tablo görünümü hücresi olarak yeniden başlatılır, yeniden kullanıldığı için, aksesuarı kontrol eden özellik hala burada mevcuttur işte bu yüzden bu tuhaf davranışla karşılaşıyoruz. Öte yandan let cell = UITableViewCell(style: .default, reuseIdentifier: "ToDoItemCell") hücreleri bu şekilde tanımlamış olsaydıkta ekranı kaydırdığımızda seçili bir satır yerine göreceğimiz şey, işaretlediğimiz satıra döndüğümüzde işaretimizin kaybolmasıdır, bunun nedeni ise işaretleme veya işareti kaldırmanın hücre üzerinde bir özellik ayarlıyor olmasıdır. Hücre ekrandan kaybolduğunda, ayrılmış ve yok edilmiş olur, geri eski yerine kaydırdığımızda aslında tablo hücresinin eklendiği yepyeni bir hücre almaktayız... Sorun şu ki, bir özelliği hücreyle değil verilerle ilişkilendirmemiz gerekiyor. Yani her hücreyi işaretli/işaretsiz özellikle ilişkilendirebilmemizin bir yoluna gerek duyuyoruz. Bu problemi MVC ile çözeceğiz
     var itemArray = [Item]()
     
     // for user default;
@@ -19,12 +19,7 @@ class TodoListViewController: UITableViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        // çökme olmasın diye if-let kullanacağız
-        /*if let items = defaults.array(forKey: "TodoListArray") as? [String] {
-            itemArray = items
-        }*/ // dizimizi Item olarak döndüreceğiz.
-        
+
         let newItem = Item()
         newItem.title = "Find"
         itemArray.append(newItem)
@@ -37,6 +32,9 @@ class TodoListViewController: UITableViewController {
         newItem.title = "Find"
         itemArray.append(newItem)
         
+        if let items = defaults.array(forKey: "ToDoListArray") as? [Item] { // as? [String] den [Item] a dönüştürüyoruz sebebi ise artık String dizi değil öğe dizisi almamız.
+            itemArray = items
+        }
         
     }
     
@@ -53,11 +51,14 @@ class TodoListViewController: UITableViewController {
         let item = itemArray[indexPath.row]
         cell.textLabel?.text = item.title
         
+        
+        cell.accessoryType = item.done == true ? .checkmark : .none
+       /*  yukarıdaki ifade -> Swift için Ternary Operator olarak adlandırılıyor.
         if item.done == true {
             cell.accessoryType = .checkmark
         }   else {
             cell.accessoryType = .none
-        }
+        }*/
         
         return cell
     }
@@ -66,13 +67,7 @@ class TodoListViewController: UITableViewController {
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         
         itemArray[indexPath.row].done = !itemArray[indexPath.row].done
-        /*
-        if itemArray[indexPath.row].done == false {
-            itemArray[indexPath.row].done = true
-        }   else {
-            itemArray[indexPath.row].done = false
-        }   */
-        
+
         tableView.reloadData()
         
         tableView.deselectRow(at: indexPath, animated: true) // ----> seçili satırın sürekli olarak renkli gösterilmesini engelliyor niiiiiice
@@ -87,7 +82,6 @@ class TodoListViewController: UITableViewController {
         let action = UIAlertAction(title: "Ekle", style: .default) { (action) in // bu alan butona basıldığında olmasını sağlayacağımız alan işte bu yüzden textfield alanını yazdırmak istiyorsak burada yapmalıyız, tetiklenen yer burası addTextField metodu değil orası sadece veri girişi için var.
             
             // what will happen once the user clicks add the item button or on our UIAlert
-            //print(textField.text)
             
             // Item sınıfınfan oluşturduğumuz nesneleri textfield da göstermek için
             let newItem = Item()
@@ -97,6 +91,8 @@ class TodoListViewController: UITableViewController {
             
             // for User Default
             self.defaults.set(self.itemArray, forKey: "TodoListArray")
+            
+            
             
             self.tableView.reloadData()
         }

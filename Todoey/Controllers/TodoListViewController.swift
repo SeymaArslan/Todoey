@@ -14,28 +14,33 @@ class TodoListViewController: UITableViewController {
     // listeye fazlaca veri eklediğimizde check yaptığımız satırın dışında başka bir verinin de check olduğunu, işareeti kaldırdığımızda seçtiğimiz satırda da işaretin kalktığını görüyoruz ve bu çok saçma bir davranış.. Sebebine gelirsek; Tablo hücremizde aslında bir satır işaretliyoruz, ardından scroll ettiğimizde kendisine gelen bilgi seçili bir satır olduğu fakat kaydırma ile değişen ekranda seçili bir satır olmadığından tablo da dolaşır ve bir satırı işaretler. dequeueReusableCell yönteminde seçtiğimiz satır görünümde kaybolduğu noktada, tablo görünümünün etrafına gelir ve altta yeni bir tablo görünümü hücresi olarak yeniden başlatılır, yeniden kullanıldığı için, aksesuarı kontrol eden özellik hala burada mevcuttur işte bu yüzden bu tuhaf davranışla karşılaşıyoruz. Öte yandan let cell = UITableViewCell(style: .default, reuseIdentifier: "ToDoItemCell") hücreleri bu şekilde tanımlamış olsaydıkta ekranı kaydırdığımızda seçili bir satır yerine göreceğimiz şey, işaretlediğimiz satıra döndüğümüzde işaretimizin kaybolmasıdır, bunun nedeni ise işaretleme veya işareti kaldırmanın hücre üzerinde bir özellik ayarlıyor olmasıdır. Hücre ekrandan kaybolduğunda, ayrılmış ve yok edilmiş olur, geri eski yerine kaydırdığımızda aslında tablo hücresinin eklendiği yepyeni bir hücre almaktayız... Sorun şu ki, bir özelliği hücreyle değil verilerle ilişkilendirmemiz gerekiyor. Yani her hücreyi işaretli/işaretsiz özellikle ilişkilendirebilmemizin bir yoluna gerek duyuyoruz. Bu problemi MVC ile çözeceğiz
     var itemArray = [Item]()
     
-    // for user default;
-    let defaults = UserDefaults.standard
+    let dataFilePath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first?.appendingPathComponent("Items.plist")
     
+    // for user default;
+//    let defaults = UserDefaults.standard siliyoruz çünkü oluşturduğumuz (dataFilePath) yolda kendi plistimizi oluşturacağız
+     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        print(dataFilePath)
 
-        let newItem = Item()
-        newItem.title = "Find"
-        itemArray.append(newItem)
+//        let newItem = Item()
+//        newItem.title = "Find"
+//        itemArray.append(newItem)
+//        
+//        let newItem2 = Item()
+//        newItem.title = "Find"
+//        itemArray.append(newItem)
+//        
+//        let newItem3 = Item()
+//        newItem.title = "Find"
+//        itemArray.append(newItem)
         
-        let newItem2 = Item()
-        newItem.title = "Find"
-        itemArray.append(newItem)
+//        if let items = defaults.array(forKey: "ToDoListArray") as? [Item] { // as? [String] den [Item] a dönüştürüyoruz sebebi ise artık String dizi değil öğe dizisi almamız.
+//            itemArray = items
+//        }
         
-        let newItem3 = Item()
-        newItem.title = "Find"
-        itemArray.append(newItem)
-        
-        if let items = defaults.array(forKey: "ToDoListArray") as? [Item] { // as? [String] den [Item] a dönüştürüyoruz sebebi ise artık String dizi değil öğe dizisi almamız.
-            itemArray = items
-        }
-        
+        loadItems()
     }
     
 //MARK: - TableView Datasource Methods
@@ -50,16 +55,8 @@ class TodoListViewController: UITableViewController {
        
         let item = itemArray[indexPath.row]
         cell.textLabel?.text = item.title
-        
-        
+
         cell.accessoryType = item.done == true ? .checkmark : .none
-       /*  yukarıdaki ifade -> Swift için Ternary Operator olarak adlandırılıyor.
-        if item.done == true {
-            cell.accessoryType = .checkmark
-        }   else {
-            cell.accessoryType = .none
-        }*/
-        
         return cell
     }
     
@@ -68,7 +65,7 @@ class TodoListViewController: UITableViewController {
         
         itemArray[indexPath.row].done = !itemArray[indexPath.row].done
 
-        tableView.reloadData()
+        saveItems()
         
         tableView.deselectRow(at: indexPath, animated: true) // ----> seçili satırın sürekli olarak renkli gösterilmesini engelliyor niiiiiice
     }
@@ -90,11 +87,9 @@ class TodoListViewController: UITableViewController {
             self.itemArray.append(newItem)  // self.itemArray.append(textField.text!)
             
             // for User Default
-            self.defaults.set(self.itemArray, forKey: "TodoListArray")
-            
-            
-            
-            self.tableView.reloadData()
+//            self.defaults.set(self.itemArray, forKey: "TodoListArray")
+
+            self.saveItems()
         }
         
         alert.addTextField { (alertTextField) in
@@ -107,8 +102,32 @@ class TodoListViewController: UITableViewController {
         
         // present(<#T##viewControllerToPresent: UIViewController##UIViewController#>, animated: <#T##Bool#>)
         present(alert, animated: true, completion: nil)
-        
-        
+
+    }
+    
+    
+    //MARK: - Model Manipulation Methods
+    func saveItems() {
+        let encoder = PropertyListEncoder()
+        do {
+            let data = try encoder.encode(itemArray)
+            try data.write(to: dataFilePath!)
+        } catch {
+            print("Error encoding item array, \(error)")
+        }
+        self.tableView.reloadData()
+    }
+    
+    func loadItems() {
+        if let data = try? Data(contentsOf: dataFilePath!) {
+            let decoder = PropertyListDecoder()
+            do {
+                itemArray = try decoder.decode([Item].self, from: data)
+            } catch {
+                print("Error decoding item array, \(error)")
+            }
+            
+        }
     }
     
 }

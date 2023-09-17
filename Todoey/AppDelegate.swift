@@ -7,6 +7,7 @@
 
 import UIKit
 import CoreData
+import RealmSwift
 
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -14,13 +15,15 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     var window: UIWindow?
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-        // Uygulama yüklendiğinde çağırılan yer, uygulamanın çökmesi önemli değil, burası çalışan ilk yer
-        //print("ilk açılan yer")
         
-        // for userdefault .. dosya yoluna ulaşmak için buraya işlem yapacağız NOT bu kod satırları simulator için ve kesinlikle kayıt işlemi için ilgili butonlara basmamız gerekiyor.
-//        print(NSSearchPathForDirectoriesInDomains(<#T##directory: FileManager.SearchPathDirectory##FileManager.SearchPathDirectory#>, <#T##domainMask: FileManager.SearchPathDomainMask##FileManager.SearchPathDomainMask#>, <#T##expandTilde: Bool##Bool#>))
+        print(Realm.Configuration.defaultConfiguration.fileURL)
+
+        do {
+            let realm = try Realm()
+        } catch {
+            print("Realm oluşturulurken hata: \(error)")
+        }
         
-        //print(NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true).last! )  // ilki dizin, ikincisi etki alanı, tilde yi genişletmek için true diyeceğiz ek olarak .last deme sebebimiz ise son öğeyi alma isteği.. ve sonucunu string olarak yazdıracağız. Uygulamamızı çalıştırdığımız anda console da dosya yolumuzu göreceğiz.
         
         return true
     }

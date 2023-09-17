@@ -14,7 +14,7 @@ class TodoListViewController: UITableViewController {
     
     var selectedCategory: Category? {
         didSet{
-            loadItems()
+//            loadItems()
         }
     }
     
@@ -67,11 +67,11 @@ class TodoListViewController: UITableViewController {
         
         let action = UIAlertAction(title: "Ekle", style: .default) { (action) in
             
-            let newItem = Item(context: self.context)   // buradaki context bilgisi Appdelegate te saveContext te ki persistentContainer dan geliyor
-            newItem.title = textField.text!
-            newItem.done = false // Coredata da done optional değil bu yüzden hata atıyor atmasın diye varsayılan olarak değer verdik
-            newItem.parentCategory = self.selectedCategory
-            self.itemArray.append(newItem)
+//            let newItem = Item(context: self.context)   // buradaki context bilgisi Appdelegate te saveContext te ki persistentContainer dan geliyor
+//            newItem.title = textField.text!
+//            newItem.done = false // Coredata da done optional değil bu yüzden hata atıyor atmasın diye varsayılan olarak değer verdik
+//            newItem.parentCategory = self.selectedCategory
+//            self.itemArray.append(newItem)
             
             self.saveItems()
         }
@@ -99,48 +99,48 @@ class TodoListViewController: UITableViewController {
         self.tableView.reloadData()
     }
     
-    func loadItems(with request: NSFetchRequest<Item> = Item.fetchRequest(), predicate: NSPredicate? = nil) {
-        let categoryPredicate = NSPredicate(format: "parentCategory.name MATCHES %@", selectedCategory!.name!)
-        
-        if let addtionalPredicate = predicate {
-            request.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [categoryPredicate, addtionalPredicate])
-        } else {
-            request.predicate = categoryPredicate
-        }
-        
-        do {
-            itemArray = try context.fetch(request)  // burası bir Item dizisi döndürüyor ki request i tanımlarken kullandık. NSFetchRequest<Item> belirtmezsek hata alırız ve itemArray olarak tanımladığımızda tablo görünümünde değerleri görürüz
-        } catch {
-            print("Error fetching data from context \(error)")
-        }
-        tableView.reloadData()
-    }
+//    func loadItems(with request: NSFetchRequest<Item> = Item.fetchRequest(), predicate: NSPredicate? = nil) {
+//        let categoryPredicate = NSPredicate(format: "parentCategory.name MATCHES %@", selectedCategory!.name!)
+//
+//        if let addtionalPredicate = predicate {
+//            request.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [categoryPredicate, addtionalPredicate])
+//        } else {
+//            request.predicate = categoryPredicate
+//        }
+//
+//        do {
+//            itemArray = try context.fetch(request)  // burası bir Item dizisi döndürüyor ki request i tanımlarken kullandık. NSFetchRequest<Item> belirtmezsek hata alırız ve itemArray olarak tanımladığımızda tablo görünümünde değerleri görürüz
+//        } catch {
+//            print("Error fetching data from context \(error)")
+//        }
+//        tableView.reloadData()
+//    }
     
     
 }
 
 
 //MARK: - SearchBar Methods
-extension TodoListViewController: UISearchBarDelegate {
-    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
-        let request: NSFetchRequest<Item> = Item.fetchRequest()
-        
-        let predicate = NSPredicate(format: "title CONTAINS[cd] %@", searchBar.text!)
-        
-        request.sortDescriptors = [NSSortDescriptor(key: "title", ascending: true)] // NSSortDescriptor bir dizi bekler her ne kadar tek bir sıralama filtremiz varsa da [] içerisine alacağız
-        
-        loadItems(with: request, predicate: predicate)
-
-    }
-    
-    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
-        if searchBar.text?.count == 0 {
-            loadItems()
-            
-            DispatchQueue.main.async {
-                searchBar.resignFirstResponder()  // searchBar da ilk duruma dönme yani imleç gidiyor ve klavye kapanıyor
-            }
-            
-        }
-    }
-}
+//extension TodoListViewController: UISearchBarDelegate {
+//    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+//        let request: NSFetchRequest<Item> = Item.fetchRequest()
+//
+//        let predicate = NSPredicate(format: "title CONTAINS[cd] %@", searchBar.text!)
+//
+//        request.sortDescriptors = [NSSortDescriptor(key: "title", ascending: true)] // NSSortDescriptor bir dizi bekler her ne kadar tek bir sıralama filtremiz varsa da [] içerisine alacağız
+//
+//        loadItems(with: request, predicate: predicate)
+//
+//    }
+//
+//    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+//        if searchBar.text?.count == 0 {
+//            loadItems()
+//
+//            DispatchQueue.main.async {
+//                searchBar.resignFirstResponder()  // searchBar da ilk duruma dönme yani imleç gidiyor ve klavye kapanıyor
+//            }
+//
+//        }
+//    }
+//}

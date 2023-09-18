@@ -81,6 +81,7 @@ class TodoListViewController: UITableViewController {
                     try self.realm.write {
                         let newItem = Item()
                         newItem.title = textField.text!
+                        newItem.dateCreated = Date()
             //            newItem.done = false  belirtmemize gerek yok çünkü default değer verdik
                         currentCategory.items.append(newItem)
                     }
@@ -103,15 +104,6 @@ class TodoListViewController: UITableViewController {
     
     
     //MARK: - Model Manipulation Methods
-//    func saveItems() {
-//
-//        do {
-//            try context.save()
-//        } catch {
-//            print("Error saving context \(error)")
-//        }
-//        self.tableView.reloadData()
-//    }
     
     func loadItems() {
         
@@ -125,26 +117,21 @@ class TodoListViewController: UITableViewController {
 
 
 //MARK: - SearchBar Methods
-//extension TodoListViewController: UISearchBarDelegate {
-//    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
-//        let request: NSFetchRequest<Item> = Item.fetchRequest()
-//
-//        let predicate = NSPredicate(format: "title CONTAINS[cd] %@", searchBar.text!)
-//
-//        request.sortDescriptors = [NSSortDescriptor(key: "title", ascending: true)] // NSSortDescriptor bir dizi bekler her ne kadar tek bir sıralama filtremiz varsa da [] içerisine alacağız
-//
-//        loadItems(with: request, predicate: predicate)
-//
-//    }
-//
-//    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
-//        if searchBar.text?.count == 0 {
-//            loadItems()
-//
-//            DispatchQueue.main.async {
-//                searchBar.resignFirstResponder()  // searchBar da ilk duruma dönme yani imleç gidiyor ve klavye kapanıyor
-//            }
-//
-//        }
-//    }
-//}
+extension TodoListViewController: UISearchBarDelegate {
+    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+        
+        todoItems = todoItems?.filter("title CONTAINS[cd] %@", searchBar.text!).sorted(byKeyPath: "dateCreated", ascending: true)  // CoreData da ki gibi tekrar loadItems metodunu çağırmamıza gerek yok çünkü loadItems ta itemlarımızı selectedCategory'den zaten yükledik
+        tableView.reloadData()
+    }
+
+    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+        if searchBar.text?.count == 0 {
+            loadItems()
+
+            DispatchQueue.main.async {
+                searchBar.resignFirstResponder()  // searchBar da ilk duruma dönme yani imleç gidiyor ve klavye kapanıyor
+            }
+
+        }
+    }
+}

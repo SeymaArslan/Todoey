@@ -7,7 +7,7 @@
 
 import UIKit
 import RealmSwift
-import SwipeCellKit
+import ChameleonFramework
 
 class CategoryTableViewController: SwipeTableViewController {
 
@@ -18,6 +18,8 @@ class CategoryTableViewController: SwipeTableViewController {
         super.viewDidLoad()
         
         loadCategories()
+        
+        tableView.separatorStyle = .none  // renk kenarlılarının keskinliğini önlemek için
         
 //        tableView.rowHeight = 80.0 // çünkü swipe satıra sığmadı bu yüzden satırı büyülttük
     }
@@ -34,7 +36,10 @@ class CategoryTableViewController: SwipeTableViewController {
         let cell = super.tableView(tableView, cellForRowAt: indexPath)
         
         cell.textLabel?.text = categories?[indexPath.row].name ?? "Henüz Kategori Eklenmedi"
-
+        cell.backgroundColor = UIColor(hexString: categories?[indexPath.row].colour ?? "38B6FF") // hexValue return String color
+        // UIColor.randomFlat.hexValue()
+        // UIColor(hexString: RandomFlatColor().hexValue())
+        
         return cell
     }
     
@@ -101,7 +106,8 @@ class CategoryTableViewController: SwipeTableViewController {
             
             let newCategory = Category()
             newCategory.name = textField.text!
-
+            newCategory.colour = UIColor.randomFlat().hexValue()
+            
             self.save(category: newCategory)
         }
         alert.addAction(action)

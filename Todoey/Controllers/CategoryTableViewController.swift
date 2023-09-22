@@ -20,8 +20,20 @@ class CategoryTableViewController: SwipeTableViewController {
         loadCategories()
         
         tableView.separatorStyle = .none  // renk kenarlılarının keskinliğini önlemek için
+
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        guard let navBar = navigationController?.navigationBar else {
+            fatalError("")
+        }
+        navBar.backgroundColor = .systemBackground
+        navBar.largeTitleTextAttributes = [NSAttributedString.Key.foregroundColor: UIColor(hexString: "5856D6")]
+        navigationController?.navigationBar.tintColor = UIColor(hexString: "5856D6")
         
-//        tableView.rowHeight = 80.0 // çünkü swipe satıra sığmadı bu yüzden satırı büyülttük
+        
+        
+        
     }
     
     
@@ -35,10 +47,17 @@ class CategoryTableViewController: SwipeTableViewController {
 
         let cell = super.tableView(tableView, cellForRowAt: indexPath)
         
-        cell.textLabel?.text = categories?[indexPath.row].name ?? "Henüz Kategori Eklenmedi"
-        cell.backgroundColor = UIColor(hexString: categories?[indexPath.row].colour ?? "38B6FF") // hexValue return String color
-        // UIColor.randomFlat.hexValue()
-        // UIColor(hexString: RandomFlatColor().hexValue())
+        if let category = categories?[indexPath.row] {
+            cell.textLabel?.text = category.name
+            
+            guard let categoryColour = UIColor(hexString: category.colour) else {
+                fatalError()
+            }
+            
+            cell.backgroundColor = categoryColour // hexValue return String color
+            cell.textLabel?.textColor = ContrastColorOf(categoryColour, returnFlat: true)
+        }
+    
         
         return cell
     }
@@ -52,7 +71,6 @@ class CategoryTableViewController: SwipeTableViewController {
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         let destinationVC = segue.destination as! TodoListViewController
-        
         if let indexPath = tableView.indexPathForSelectedRow {
             destinationVC.selectedCategory = categories?[indexPath.row]
         }
